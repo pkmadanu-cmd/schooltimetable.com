@@ -1,0 +1,3262 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>School Time Table</title>
+
+<style>
+body { margin:0; font-family:Arial; background:#e5e5e5; }
+
+/* HEADER */
+.header{
+  background:#2f4f7f;
+  color:white;
+  text-align:center;
+  padding:12px;
+}
+
+/* LAYOUT */
+.container{
+  display:flex;
+  height:calc(100vh - 60px);
+}
+
+/* SIDEBAR */
+/* SIDEBAR - IMPROVED UI ONLY */
+.sidebar{
+  width:220px;
+  background:linear-gradient(180deg,#2f4f7f,#243a5c);
+  padding:15px 10px;
+  color:white;
+  box-shadow:2px 0 10px rgba(0,0,0,0.15);
+}
+
+/* MENU ITEMS */
+.sidebar div{
+  padding:10px 12px;
+  margin:6px 8px;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  transition:0.2s;
+  background:rgba(255,255,255,0.05);
+}
+
+/* HOVER EFFECT */
+.sidebar div:hover{
+  background:rgba(255,255,255,0.18);
+  transform:translateX(3px);
+}
+
+/* FIRST FEW MAIN MENU ITEMS (optional visual priority) */
+.sidebar div:nth-child(-n+4){
+  font-weight:600;
+}
+
+/* REMOVE DUPLICATE VISUAL CLUTTER SPACING IMPROVEMENT */
+.sidebar div + div{
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+
+/* MAIN */
+.main{
+  flex:1;
+  background:#e5e5e5;
+  padding:20px;
+}
+
+/* FORM */
+.form{
+  display:flex;
+  flex-wrap:wrap;
+  gap:15px;
+  align-items:end;
+}
+
+input, select{
+  padding:8px;
+  width:180px;
+}
+
+/* BUTTONS */
+.btn{
+  padding:8px 15px;
+  border:1px solid #2f4f7f;
+  background:#ddd;
+  cursor:pointer;
+  border-radius:6px;
+}
+
+.btn:hover{
+  background:#ccc;
+}
+
+/* TABLE */
+.table{
+  margin-top:20px;
+}
+
+.row, .header-row{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 150px;
+  padding:8px;
+}
+
+.header-row{
+  background:#2f4f7f;
+  color:white;
+}
+
+.row{
+  background:white;
+  margin-top:5px;
+}
+
+.action button{
+  margin-right:5px;
+}
+
+.small-input{
+  width:45px !important;
+  padding:4px !important;
+  font-size:12px;
+  text-align:center;
+}
+
+/* DEFAULT TABLE (Teacher & Periods) */
+#teacherList .header-row,
+#teacherList .row {
+  grid-template-columns: 1fr 1fr 1fr 1fr 150px;
+}
+/* CLASS SUBJECTS TABLE ONLY */
+/* CLASS SUBJECTS TABLE ONLY - FIXED RESPONSIVE UI */
+#page-subject .table {
+  overflow-x: auto;   /* enables horizontal scroll instead of breaking UI */
+}
+
+#page-subject .header-row,
+#page-subject .row {
+  grid-template-columns:
+    140px repeat(14, minmax(60px, 1fr)) 90px;
+}
+
+
+/* ===== TIMETABLE UI IMPROVEMENT ===== */
+
+.tt-box{
+  background:#fff;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.tt-title{
+  font-weight:bold;
+  margin-bottom:8px;
+  color:#2f4f7f;
+}
+
+/* CHIP STYLE CHECKBOX */
+.tt-chip-group{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.tt-chip{
+  position:relative;
+}
+
+.tt-chip input{
+  display:none;
+}
+
+.tt-chip label{
+  display:inline-block;
+  padding:6px 12px;
+  border:1px solid #2f4f7f;
+  border-radius:20px;
+  cursor:pointer;
+  font-size:13px;
+  background:#f5f7fb;
+  transition:0.2s;
+}
+
+.tt-chip input:checked + label{
+  background:#2f4f7f;
+  color:white;
+}
+
+
+.error {
+  border: 2px solid red !important;
+}
+
+.error-msg {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* CLASS & SECTION DROPDOWN SMALL WIDTH */
+#class,
+ {
+  width: 120px !important;   /* adjust 100px–150px as you like */
+}
+
+/* FIX: TEACHER PERIOD TABLE WIDTH */
+#page-period .header-row,
+#page-period .row {
+  grid-template-columns: 1fr 1fr 1fr 1fr 150px;
+}
+
+/* 🔥 TEACHER SUMMARY CARDS */
+.summary-card{
+  flex:1;
+  min-width:160px;
+  background:#ffffff;
+  padding:12px 14px;
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  position:relative;
+  transition:0.2s;
+  border-top:4px solid #2f4f7f;
+}
+
+.summary-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 6px 14px rgba(0,0,0,0.12);
+}
+
+.summary-title{
+  font-size:12px;
+  color:#666;
+  margin-bottom:6px;
+}
+
+.summary-value{
+  font-size:16px;
+  font-weight:bold;
+  color:#2f4f7f;
+  white-space:pre-line;
+}
+
+/* 🎨 different colors */
+.card-blue{ border-top-color:#3b82f6; }
+.card-red{ border-top-color:#ef4444; }
+.card-green{ border-top-color:#22c55e; }
+.card-orange{ border-top-color:#f97316; }
+
+/* 🔥 MODERN TIMETABLE UI */
+
+.tt-card{
+  background:#ffffff;
+  border-radius:12px;
+  padding:15px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+.tt-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.tt-main-title{
+  font-size:16px;
+  font-weight:700;
+  color:#2f4f7f;
+}
+
+.tt-sub-title{
+  font-size:17px;   /* 🔥 increased */
+  font-weight:700;  /* optional: makes it bold */
+  color:#333;       /* optional: darker for visibility */
+}
+
+.tt-teacher{
+  font-size:16px;     /* 🔥 increased from 13px */
+  font-weight:600;    /* optional: makes it clearer */
+  background:#eef3fb;
+  padding:8px 12px;   /* slightly bigger box */
+  border-radius:6px;
+}
+
+/* TABLE */
+.tt-table{
+  width:100%;
+  border-collapse:collapse;
+  overflow:hidden;
+  border-radius:10px;
+}
+
+.tt-table th{
+  background:#2f4f7f;
+  color:white;
+  padding:10px;
+  font-size:13px;
+}
+
+.tt-table td{
+  border:1px solid #eee;
+  height:70px;
+  text-align:center;
+  vertical-align:middle;
+  padding:5px;
+}
+
+/* PERIOD COLUMN */
+.tt-period{
+  background:#f5f7fb;
+  font-weight:bold;
+}
+
+/* CELL DESIGN */
+.tt-cell{
+  background:#f8fafc;
+  border-radius:8px;
+  padding:6px;
+  transition:0.2s;
+}
+
+.tt-cell:hover{
+  background:#e8f0ff;
+}
+
+/* SUBJECT */
+.tt-subject{
+  font-size:12px;
+  font-weight:700;
+  color:#2f4f7f;
+}
+
+.tt-subject.free{
+  color:#ef4444;
+}
+
+/* CLASS */
+.tt-class{
+  font-weight:bold;
+  font-size:12px;
+}
+
+/* TEACHER NAME */
+.tt-teacher-name{
+  font-size:11px;
+  color:#555;
+}
+
+/* SELECTABLE CELLS */
+.selectable{
+  cursor:pointer;
+}
+
+.selected{
+  border:2px solid #ef4444;
+  background:#ffecec;
+}
+
+.header h2{
+  margin: 0;          /* remove default big space */
+  margin-bottom: 2px; /* small controlled space */
+}
+
+.header div{
+  margin: 0;          /* remove extra gap */
+  line-height: 1.2;   /* tighter spacing */
+}
+
+/* 🎨 BUTTON COLORS */
+.btn-green{
+  background:#22c55e;
+  border:1px solid #16a34a;
+  color:white;
+}
+
+.btn-green:hover{
+  background:#16a34a;
+}
+
+.btn-red{
+  background:#ef4444;
+  border:1px solid #dc2626;
+  color:white;
+}
+
+.btn-red:hover{
+  background:#dc2626;
+}
+
+.btn-orange{
+  background:#f97316;
+  border:1px solid #ea580c;
+  color:white;
+}
+
+.btn-orange:hover{
+  background:#ea580c;
+}
+
+.tt-class-highlight{
+  font-size:17px;
+  font-weight:700;
+  color:#111;
+}
+
+/* 🔽 CLASS TEACHER LIST - SMALL FONT */
+#page-classTeacher .header-row,
+#page-classTeacher .row {
+  font-size: 15px;   /* 👈 main change */
+  padding:6px 8px;   /* reduce height */
+}
+
+/* reduce title size slightly */
+#page-classTeacher .tt-main-title{
+  font-size:15px;
+}
+
+#page-classTeacher .tt-sub-title{
+  font-size:14px;
+}
+
+/* optional: tighter rows */
+#page-classTeacher .row{
+  margin-top:3px;
+}
+
+/* 🖨️ PRINT BUTTON STYLE */
+.btn-print{
+  background:#6366f1;   /* Indigo (nice professional color) */
+  border:1px solid #4f46e5;
+  color:white;
+}
+
+.btn-print:hover{
+  background:#4f46e5;
+}
+
+
+.work-type-box{
+  background:#f8fafc;
+  padding:12px 15px;
+  border-radius:10px;
+  border:1px solid #dbeafe;
+  margin-bottom:10px;
+}
+
+.work-title{
+  font-weight:600;
+  font-size:14px;
+  color:#2f4f7f;
+  display:block;
+  margin-bottom:8px;
+}
+
+.work-options{
+  display:flex;
+  gap:20px;
+}
+
+/* OPTION */
+.work-option{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  font-size:14px;
+}
+
+/* HIDE DEFAULT RADIO */
+.work-option input{
+  display:none;
+}
+
+/* CUSTOM RADIO */
+.custom-radio{
+  width:16px;
+  height:16px;
+  border-radius:50%;
+  border:2px solid #2f4f7f;
+  position:relative;
+  transition:0.2s;
+}
+
+/* INNER DOT */
+.custom-radio::after{
+  content:"";
+  width:8px;
+  height:8px;
+  background:#2f4f7f;
+  border-radius:50%;
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  transition:0.2s;
+}
+
+/* ACTIVE */
+.work-option input:checked + .custom-radio::after{
+  transform:translate(-50%,-50%) scale(1);
+}
+
+/* LABEL TEXT */
+.label-text{
+  color:#333;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h2>St. Anns High School ICSE-ISC</h2>
+  <div>Pet Basheerabad - Kompally</div>
+</div>
+
+<div class="container">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+
+<div onclick="showPage('teacher')">Add Teachers</div>
+<div onclick="showPage('period')">Teacher Working Periods per Week</div>
+<div onclick="showPage('subject')">Class Subjects</div>
+<div onclick="showPage('timetable')">Time Table Organizer</div>
+<div onclick="showPage('classTeacher')">Class Teacher List</div>
+<div onclick="showPage('nonClassTeacher')">Non-Class Teachers List</div>
+<div onclick="showPage('print')">Print Time Table</div>
+
+
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- PAGE 1: ADD TEACHERS -->
+  <div id="page-teacher" class="page">
+
+    <div class="form">
+
+      <div>
+        <label>Teacher Name</label><br>
+        <input type="text" id="name" style="text-transform: uppercase;" oninput="forceUppercase(this)">
+      </div>
+
+      <div>
+      <label>Subject</label><br>
+      <select id="subject">
+        <option value="">Select Subject</option>
+        <option>ENGLISH</option>
+        <option>HINDI</option>
+        <option>TELUGU</option>
+        <option>MATHS</option>
+        <option>SCIENCE</option>
+        <option>SOCIAL</option>
+        <option>COMPUTER</option>
+        <option>BIOLOGY</option>
+        <option>CHEMISTRY</option>
+        <option>PHYSICS</option>
+        <option>BIO-LAB</option>
+        <option>CHEM-LAB</option>
+        <option>PHYS-LAB</option>       
+        <option>PT</option>        
+      </select>
+    </div>
+
+      <div>
+        <label>Class</label><br>
+        <select id="class" required></select>
+      </div>   
+
+      <div>
+      <label>Is Class Teacher?</label><br>
+      <select id="isClassTeacher">
+        <option value="">Select</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+    </div>  
+
+      <button class="btn" onclick="addTeacher()">Add</button>
+      <button class="btn" onclick="updateTeacher()">Edit</button>
+      <button class="btn" onclick="deleteTeacher()">Delete</button>
+
+    </div>
+
+        <!-- 🔍 TEACHER SEARCH -->
+    <div style="margin-top:15px;margin-bottom:10px;">
+      <input 
+        id="teacherSearch" 
+        placeholder="Search teacher name..." 
+        style="padding:8px;width:250px;border:1px solid #aaa;border-radius:6px;"
+        oninput="filterTeachers()"
+      >
+    </div>
+
+    <div class="table">
+      <div class="header-row" style="grid-template-columns:1fr 1fr 1fr 1fr 150px;">
+      <div>Name</div>
+      <div>Subject</div>
+      <div>Class</div>  
+      <div>Class Teacher</div>    
+      <div>Action</div>
+    </div>
+
+      <div id="teacherList"></div>
+    </div>
+
+  </div>
+
+
+  <!-- PAGE 2: TEACHER PERIODS -->
+  <div id="page-period" class="page" style="display:none">
+
+    <h3>Teacher Working Periods per Week</h3>
+
+    <div class="form">
+      <div>
+        <label>Select Teacher</label><br>
+        <select id="p_teacher"></select>
+      </div>
+
+      <div>
+        <label>No. Classes per Week</label><br>
+        <input id="p_classes">
+      </div>
+
+      <div>
+        <label>No. Free Periods</label><br>
+        <input id="p_free">
+      </div>
+
+      <button class="btn" onclick="addPeriod()">Add</button>
+      <button class="btn" onclick="updatePeriod()">Edit</button>
+      <button class="btn" onclick="deletePeriod()">Delete</button>
+    </div>
+    <div class="table">
+
+      <div class="header-row">
+        <div>Teacher</div>
+        <div>Classes/Week</div>
+        <div>Free Periods</div>
+        <div></div>
+        <div>Action</div>
+      </div>
+
+  <div id="periodList"></div>
+
+</div>
+
+  </div>
+
+
+  <!-- PAGE 3: CLASS SUBJECTS -->
+  <div id="page-subject" class="page" style="display:none">
+
+  <h3>Class Subjects</h3>
+
+  <div class="form">
+
+    <div>
+      <label>Class&Sec</label><br>
+      <select id="cs_class"></select>
+    </div>
+
+    <div><label>English</label><br><input id="cs_english" type="number" class="small-input"></div>
+    <div><label>Hindi</label><br><input id="cs_hindi" type="number" class="small-input"></div>
+    <div><label>Telugu</label><br><input id="cs_telugu" type="number" class="small-input"></div>
+    <div><label>Maths</label><br><input id="cs_maths" type="number" class="small-input"></div>
+    <div><label>Science</label><br><input id="cs_science" type="number" class="small-input"></div>
+    <div><label>Social</label><br><input id="cs_social" type="number" class="small-input"></div>
+    <div><label>Computer</label><br><input id="cs_computer" type="number" class="small-input"></div>
+
+    <div><label>Biology</label><br><input id="cs_biology" type="number" class="small-input"></div>
+    <div><label>Chemistry</label><br><input id="cs_chemistry" type="number" class="small-input"></div>
+    <div><label>Physics</label><br><input id="cs_physics" type="number" class="small-input"></div>
+
+    <div><label>Bio Lab</label><br><input id="cs_biolab" type="number" class="small-input"></div>
+    <div><label>Chem Lab</label><br><input id="cs_chemlab" type="number" class="small-input"></div>
+    <div><label>Phys Lab</label><br><input id="cs_physlab" type="number" class="small-input"></div>  
+
+    <div><label>PT</label><br><input id="cs_games" type="number" class="small-input"></div>
+   
+    <div style="width:100%;margin-top:15px;">
+      <button class="btn" onclick="addClassSubject()">Add</button>
+      <button class="btn" onclick="updateClassSubject()">Edit</button>
+      <button class="btn" onclick="deleteClassSubject()">Delete</button>
+    </div>
+
+  </div>
+
+  <!-- TABLE -->
+  <div class="table">
+
+    <div class="header-row">
+      <div>Class</div>
+      <div>Eng</div>
+      <div>Hin</div>
+      <div>Tel</div>
+      <div>Math</div>
+      <div>Sci</div>
+      <div>Soc</div>
+      <div>Comp</div>
+      <div>Bio</div>
+      <div>Chem</div>
+      <div>Phy</div>
+      <div>BioLab</div>
+      <div>ChemLab</div>
+      <div>PhyLab</div>    
+      <div>PT</div>
+      <div>Action</div>
+    </div>
+
+    <div id="classSubjectList"></div>
+
+  </div>
+
+</div>
+
+
+  <!-- PAGE 4: TIMETABLE -->
+  <!-- PAGE 4: TIMETABLE -->
+<div id="page-timetable" class="page" style="display:none">
+
+  <h3>Time Table Organizer</h3>
+
+  <!-- CLASS SELECT -->
+  <div class="form">
+  
+     <div>
+      <label>Select Teacher</label><br>
+      <select id="tt_teacher"></select>
+      <div id="tt_teacherBox" style="margin-top:6px;padding:6px;background:#FEF9C2;border-radius:6px;"></div>
+    </div>  
+
+    <div>
+      <label>Select Class & Section</label><br>
+      <select id="tt_class"></select>
+      <div id="tt_classBox" style="margin-top:6px;padding:6px;background:#ECFCCA;color:#000;border-radius:6px;"></div>
+    </div>
+
+    <!-- SUBJECT SELECT -->
+    <div>
+      <label>Select Subject</label><br>
+      <select id="tt_subject"></select>
+      <div id="tt_subjectBox" style="margin-top:6px;padding:6px;background:#DCFCE7;border-radius:6px;"></div>
+    </div>
+
+    <!-- TEACHER SELECT -->
+    
+
+  </div>
+
+  <hr>
+
+  <!-- TEACHER DETAILS AUTO SHOW -->
+  <div id="teacherInfo" class="tt-box">
+
+  <div class="tt-title">Teacher Work Summary</div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+
+  <div class="summary-card card-blue">
+    <div class="summary-title">Class Teacher Of</div>
+    <div class="summary-value" id="teachClassTeacher"></div>
+  </div>
+
+  <div class="summary-card card-red">
+    <div class="summary-title">Subject</div>
+    <div class="summary-value" id="teachSubjects"></div>
+  </div>
+
+  <div class="summary-card card-green">
+    <div class="summary-title">Classes / Week</div>
+    <div class="summary-value" id="teachClasses"></div>
+  </div>
+
+  <div class="summary-card card-orange">
+    <div class="summary-title">Free Periods</div>
+    <div class="summary-value" id="teachFree"></div>
+  </div>
+
+</div>
+
+  </div>
+  <hr>
+
+  <div class="work-type-box">
+  <label class="work-title">Allocate Work Type</label>
+
+  <div class="work-options">
+
+    <label class="work-option">
+      <input type="radio" name="workType" id="work-class" checked>
+      <span class="custom-radio"></span>
+      <span class="label-text">Class Period</span>
+    </label>
+
+    <label class="work-option">
+      <input type="radio" name="workType" id="work-free">
+      <span class="custom-radio"></span>
+      <span class="label-text">Free Period</span>
+    </label>
+
+  </div>
+</div>
+
+
+</div>
+   <hr>
+    <!-- ✅ CLASS SUBJECT SUMMARY -->
+  <div id="classSubjectInfo" class="tt-box">
+
+    <div class="tt-title">Class Subject Summary</div>
+
+    <div id="classSubjectsDisplay"
+         style="display:flex;flex-wrap:wrap;gap:8px;">
+    </div>
+
+  </div>
+  <hr>
+
+  <!-- WEEK SELECTION -->
+  <div class="tt-box">
+  <div class="tt-title">Select Week Days</div>
+  <div class="tt-chip-group">
+
+    <div class="tt-chip">
+      <input type="checkbox" id="mon" value="MON">
+      <label for="mon">MON</label>
+    </div>
+
+    <div class="tt-chip">
+      <input type="checkbox" id="tue" value="TUE">
+      <label for="tue">TUE</label>
+    </div>
+
+    <div class="tt-chip">
+      <input type="checkbox" id="wed" value="WED">
+      <label for="wed">WED</label>
+    </div>
+
+    <div class="tt-chip">
+      <input type="checkbox" id="thu" value="THU">
+      <label for="thu">THU</label>
+    </div>
+
+    <div class="tt-chip">
+      <input type="checkbox" id="fri" value="FRI">
+      <label for="fri">FRI</label>
+    </div>
+
+    <div class="tt-chip">
+      <input type="checkbox" id="sat" value="SAT">
+      <label for="sat">SAT</label>
+    </div>
+
+  </div>
+</div>
+
+  <hr>
+
+  <!-- PERIODS -->
+  <div class="tt-box">
+  <div class="tt-title">Select Period</div>
+  <div class="tt-chip-group">
+
+    <div class="tt-chip"><input type="checkbox" id="p1" value="1"><label for="p1">1</label></div>
+    <div class="tt-chip"><input type="checkbox" id="p2" value="2"><label for="p2">2</label></div>
+    <div class="tt-chip"><input type="checkbox" id="p3" value="3"><label for="p3">3</label></div>
+    <div class="tt-chip"><input type="checkbox" id="p4" value="4"><label for="p4">4</label></div>
+    <div class="tt-chip"><input type="checkbox" id="p5" value="5"><label for="p5">5</label></div>
+    <div class="tt-chip"><input type="checkbox" id="p6" value="6"><label for="p6">6</label></div>
+    <div class="tt-chip"><input type="checkbox" id="p7" value="7"><label for="p7">7</label></div>
+    <div class="tt-chip"><input type="checkbox" id="p8" value="8"><label for="p8">8</label></div>
+
+  </div>
+</div>
+
+  <hr>
+
+  <!-- ACTION -->
+<button class="btn btn-green" onclick="createTimetable()">Create Time Table</button> 
+<button class="btn btn-red" onclick="deleteSelectedPeriods()">Delete Selected Periods</button> 
+<button class="btn btn-orange" onclick="reloadPage()">Reload</button>
+  <hr>
+
+  <!-- RESULT TABLES -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;">
+
+      <div style="background:white;padding:10px;border-radius:8px;">
+      <div id="teacherTimeTable"></div>
+    </div> 
+
+    <div style="background:white;padding:10px;border-radius:8px;">
+      <div id="classTimeTable"></div>
+    </div>
+
+  
+
+</div>
+</div>
+
+<!-- PAGE: CLASS TEACHER LIST -->
+<div id="page-classTeacher" class="page" style="display:none">
+
+  <div class="tt-card">
+
+    <div class="tt-header">
+      <div>
+        <div class="tt-main-title">Class Teacher List</div>
+        <div class="tt-sub-title">All Assigned Class Teachers</div>
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div style="margin-bottom:15px;">
+      <button class="btn btn-green" onclick="loadClassTeacherList()">Load Class Teacher List</button>
+      <button class="btn btn-orange" onclick="reloadClassTeacherList()">Reload</button>
+      <button class="btn btn-print" onclick="printClassTeacherList()">Print</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table">
+      <div class="header-row" style="grid-template-columns:60px 1fr 1fr;">
+        <div>S.No</div>
+        <div>Teacher Name</div>
+        <div>Class & Section</div>
+      </div>
+
+      <div id="classTeacherList"></div>
+    </div>
+
+  </div>
+
+</div>
+<!-- PAGE: NON CLASS TEACHER LIST -->
+<div id="page-nonClassTeacher" class="page" style="display:none">
+
+  <div class="tt-card">
+
+    <div class="tt-header">
+      <div>
+        <div class="tt-main-title">Non-Class Teacher List</div>
+        <div class="tt-sub-title">All Non-Class Teachers</div>
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+    <div style="margin-bottom:15px;">
+      <button class="btn btn-green" onclick="loadNonClassTeacherList()">Load Non-Class Teacher List</button>
+      <button class="btn btn-orange" onclick="reloadNonClassTeacherList()">Reload</button>
+      <button class="btn btn-print" onclick="printNonClassTeacherList()">Print</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table">
+      <div class="header-row" style="grid-template-columns:60px 1fr 1fr 1fr;">
+        <div>S.No</div>
+        <div>Teacher Name</div>
+        <div>Subject</div>
+        <div>Class & Section</div>
+      </div>
+
+      <div id="nonClassTeacherList"></div>
+    </div>
+
+  </div>
+
+</div>
+<!---->
+<!-- PAGE: PRINT TIMETABLE -->
+<div id="page-print" class="page" style="display:none">
+
+  <div class="tt-card">
+
+    <div class="tt-header">
+      <div>
+        <div class="tt-main-title">Time Table</div>
+        <div class="tt-sub-title">Print Section</div>
+      </div>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="form" style="margin-bottom:20px;">
+
+      <div>
+        <label>Select Class & Section</label><br>
+        <select id="print_class"></select>
+      </div>
+
+      <div>
+        <label>Select Teacher</label><br>
+        <select id="print_teacher"></select>
+      </div>
+
+      <div style="align-self:end;">
+        <button class="btn btn-green" onclick="loadPrintClass()">Show Class TT</button>
+        <button class="btn btn-green" onclick="loadPrintTeacher()">Show Teacher TT</button>
+        <button class="btn btn-orange" onclick="reloadPrint()">Reload</button>
+      </div>
+
+      <div style="align-self:end;">
+        <button class="btn btn-print" onclick="printTimetable()">Print</button>
+      </div>
+
+    </div>
+
+    <!-- OUTPUT -->
+    <div id="printArea"></div>
+
+  </div>
+
+</div>
+<!---->
+
+
+</div>
+</div>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+
+<script>
+
+firebase.initializeApp({
+  apiKey:"AIzaSyCAN6kPnR6VWRV-f_6t8g4w1SkxNNHyl2c",
+  authDomain:"schoolapp-a9681.firebaseapp.com",
+  projectId:"schoolapp-a9681"
+});
+
+const db = firebase.firestore();
+
+let selectedId = null;
+let selectedCells = [];   // 👈 ADD HERE
+
+/* ADD */
+function addTeacher(){
+
+  const name = document.getElementById("name").value.trim().toUpperCase();
+  const subject = document.getElementById("subject").value.trim();
+  const className = document.getElementById("class").value;
+  const isClassTeacher = document.getElementById("isClassTeacher").value;
+
+  if(!name){
+    alert("Please enter teacher name");
+    return;
+  }
+
+  if(!subject){
+    alert("Please select subject");
+    return;
+  }
+
+  if(!className || className === "Select Class"){
+    alert("Please select Class & Section");
+    return;
+  }
+
+  if(!isClassTeacher){
+    alert("Please select Class Teacher option");
+    return;
+  }
+
+  // 🔥 IMPORTANT CHECK
+  if(isClassTeacher === "Yes"){
+
+    db.collection("tt_teachers")
+      .where("name","==",name)
+      .where("isClassTeacher","==","Yes")
+      .get()
+      .then(snap=>{
+
+        if(!snap.empty){
+          alert("Teacher is already assigned as Class Teacher!");
+          return;
+        }
+
+        saveTeacher(); // ✅ only if no duplicate
+
+      });
+
+  } else {
+    saveTeacher(); // normal save
+  }
+
+  function saveTeacher(){
+
+    const data = {
+      name,
+      subject,
+      className,
+      isClassTeacher
+    };
+
+    db.collection("tt_teachers").add(data)
+    .then(()=>{
+      alert("Teacher Added");
+      clear();
+    })
+    .catch(err=>{
+      console.error(err);
+      alert("Error adding teacher");
+    });
+  }
+}
+/* LOAD */
+function loadSubjectDropdown(){
+
+  const subjects = [
+    "ENGLISH","HINDI","TELUGU","MATHS","SCIENCE","SOCIAL", "COMPUTER",
+    "BIOLOGY","CHEMISTRY","PHYSICS",
+    "BIO-LAB","CHEM-LAB","PHYS-LAB",
+    "PT",
+  ];
+
+  let options = `<option value="">Select Subject</option>`;
+
+  subjects.forEach(sub=>{
+    options += `<option value="${sub}">${sub}</option>`;
+  });
+
+  document.getElementById("tt_subject").innerHTML = options;
+}
+
+/* SELECT */
+function selectTeacher(id,n,s,c,ct){
+  selectedId = id;
+
+  document.getElementById("name").value = n;
+  document.getElementById("subject").value = s;
+  document.getElementById("class").value = c;  
+  document.getElementById("isClassTeacher").value = ct || "";
+}
+
+
+/* UPDATE */
+function updateTeacher(){
+
+  if(!selectedId){
+    alert("Select teacher first");
+    return;
+  }
+
+  const name = document.getElementById("name").value.trim().toUpperCase();
+  const isClassTeacher = document.getElementById("isClassTeacher").value;
+
+  if(isClassTeacher === "Yes"){
+
+    db.collection("tt_teachers")
+      .where("name","==",name)
+      .where("isClassTeacher","==","Yes")
+      .get()
+      .then(snap=>{
+
+        let alreadyExists = false;
+
+        snap.forEach(doc=>{
+          if(doc.id !== selectedId){
+            alreadyExists = true;
+          }
+        });
+
+        if(alreadyExists){
+          alert("Teacher is already a Class Teacher!");
+          return;
+        }
+
+        doUpdate(); // ✅ safe
+
+      });
+
+  } else {
+    doUpdate();
+  }
+
+  function doUpdate(){
+    db.collection("tt_teachers").doc(selectedId).update({
+      name,
+      subject: document.getElementById("subject").value,
+      className: document.getElementById("class").value,
+      isClassTeacher
+    }).then(()=>{
+      alert("Updated");
+      clear();
+    });
+  }
+}
+/* DELETE */
+function deleteTeacher(){
+  if(!selectedId){
+    alert("Select teacher first");
+    return;
+  }
+
+  db.collection("tt_teachers").doc(selectedId).delete()
+  .then(()=>{
+    alert("Deleted");
+    clear();
+  });
+}
+
+/* CLEAR */
+function clear(){
+  document.getElementById("name").value="";
+  document.getElementById("subject").value="";
+  document.getElementById("class").value="";
+  document.getElementById("isClassTeacher").value="";
+  selectedId=null;
+
+  // 🔥 CLEAR YELLOW LABELS
+  document.getElementById("tt_teacherBox").innerText = "";
+  document.getElementById("tt_classBox").innerText = "";
+  document.getElementById("tt_subjectBox").innerText = "";
+
+  document.getElementById("teachSubjects").innerText = "";
+  document.getElementById("teachClassTeacher").innerText = "";
+  document.getElementById("teachClasses").innerText = "";
+  document.getElementById("teachFree").innerText = "";
+}
+function showPage(page){
+
+  // ✅ SAVE CURRENT PAGE
+  localStorage.setItem("lastPage", page);
+
+  // 🔥 1. CLEAR EVERYTHING FIRST
+  resetAllForms();
+
+  // 🔥 2. HIDE ALL PAGES
+  document.querySelectorAll(".page").forEach(p=>{
+    p.style.display = "none";
+  });
+
+  // 🔥 3. SHOW SELECTED PAGE
+  document.getElementById("page-" + page).style.display = "block";
+
+  // 🔥 4. LOAD REQUIRED DATA
+  if(page === "timetable"){
+    loadClassDropdown();
+    loadSubjectDropdown();
+  }
+
+  if(page === "teacher"){
+    loadClassDropdown();
+  }
+
+  if(page === "print"){
+    loadClassDropdown();
+
+    document.getElementById("print_class").innerHTML =
+      document.getElementById("tt_class").innerHTML;
+
+    document.getElementById("print_teacher").innerHTML =
+      document.getElementById("tt_teacher").innerHTML;
+  }
+}
+
+function resetAllForms(){
+
+  // 🔥 Clear ALL input fields
+  document.querySelectorAll("input").forEach(el=>{
+    if(el.type === "checkbox" || el.type === "radio"){
+      el.checked = false;
+    } else {
+      el.value = "";
+    }
+  });
+
+  // 🔥 Clear ALL dropdowns
+  document.querySelectorAll("select").forEach(el=>{
+    el.selectedIndex = 0;
+  });
+
+  // 🔥 Reset global variables
+  selectedId = null;
+  selectedPeriodId = null;
+  selectedClassSubjectId = null;
+  selectedCells = [];
+
+  // 🔥 Clear UI sections
+  const ids = [
+    "classTimeTable",
+    "teacherTimeTable",
+    "printArea",
+    "classSubjectsDisplay",
+    "teachSubjects",
+    "teachClassTeacher",
+    "teachClasses",
+    "teachFree"
+  ];
+
+  ids.forEach(id=>{
+    let el = document.getElementById(id);
+    if(el) el.innerHTML = "";
+  });
+
+}
+let selectedPeriodId = null;
+
+/* ADD PERIOD */
+function addPeriod(){
+
+  let teacherVal = document.getElementById("p_teacher").value;
+
+  if(!teacherVal){
+    alert("Select teacher");
+    return;
+  }
+
+  let [teacherId, teacherName] = teacherVal.split("|");
+
+  // 🔥 check duplicate
+  db.collection("tt_teacher_periods")
+    .where("teacherId","==",teacherId)
+    .get()
+    .then(snap=>{
+
+      if(!snap.empty){
+        alert("This teacher already has entry. Use Edit.");
+        return;
+      }
+
+      const data = {
+        teacherId,
+        teacherName,
+        classesPerWeek: Number(document.getElementById("p_classes").value || 0),
+        freePeriods: Number(document.getElementById("p_free").value || 0)
+      };
+
+      db.collection("tt_teacher_periods").add(data)
+      .then(()=>{
+        alert("Saved");
+        clearPeriod();
+      });
+
+    });
+}
+/* LOAD PERIODS */
+db.collection("tt_teacher_periods").onSnapshot(snap=>{
+  let html = "";
+
+  snap.forEach(doc=>{
+    let p = doc.data();
+
+    html += `
+    <div class="row">
+      <div>${p.teacherName}</div>
+      <div>${p.classesPerWeek ?? 0}</div>
+      <div>${p.freePeriods ?? 0}</div>
+      <div></div>
+      <div class="action">
+        <button onclick="selectPeriod('${doc.id}','${p.teacherId}','${p.teacherName}','${p.classesPerWeek}','${p.freePeriods}')">Select</button>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById("periodList").innerHTML = html;
+});
+
+function selectPeriod(id, teacherId, teacherName, classes, free){
+
+  selectedPeriodId = id;
+
+  // set dropdown value
+  document.getElementById("p_teacher").value = teacherId + "|" + teacherName;
+
+  document.getElementById("p_classes").value = classes;
+  document.getElementById("p_free").value = free;
+}
+
+/* UPDATE */
+function updatePeriod(){
+  if(!selectedPeriodId){
+    alert("Select record first");
+    return;
+  }
+
+  let teacherVal = document.getElementById("p_teacher").value;
+  let [teacherId, teacherName] = teacherVal.split("|");
+
+  db.collection("tt_teacher_periods").doc(selectedPeriodId).update({
+    teacherId,
+    teacherName,
+    classesPerWeek: Number(document.getElementById("p_classes").value),
+    freePeriods: Number(document.getElementById("p_free").value)
+  }).then(()=>{
+    alert("Updated");
+    clearPeriod();
+  });
+}
+
+/* DELETE */
+function deletePeriod(){
+  if(!selectedPeriodId){
+    alert("Select record first");
+    return;
+  }
+
+  db.collection("tt_teacher_periods").doc(selectedPeriodId).delete()
+  .then(()=>{
+    alert("Deleted");
+    clearPeriod();
+  });
+}
+
+/* CLEAR */
+function clearPeriod(){
+  document.getElementById("p_teacher").value="";
+  document.getElementById("p_classes").value="";
+  document.getElementById("p_free").value="";
+  selectedPeriodId = null;
+}
+
+function loadClassDropdown(){
+
+  const classes = [];
+  const sections = ["A","B","C","D","E","F","G","H","I"];
+
+  ["LKG","UKG"].forEach(c=>{
+    sections.forEach(s=> classes.push(c + " " + s));
+  });
+
+  for(let i=1;i<=10;i++){
+    sections.forEach(s=> classes.push(i + " " + s));
+  }
+
+  ["A","B"].forEach(s=>{
+    classes.push("11 " + s);
+    classes.push("12 " + s);
+  });
+
+  let options = `<option value="" disabled selected>Select Class & Section</option>`;
+
+  classes.forEach(c=>{
+    options += `<option value="${c}">${c}</option>`;
+  });
+
+  // ✅ Fill ALL dropdowns
+  document.getElementById("cs_class").innerHTML = options;
+  document.getElementById("class").innerHTML = options;
+  document.getElementById("tt_class").innerHTML = options; // 🔥 ADD THIS
+}
+let selectedClassSubjectId = null;
+
+/* ADD */
+function addClassSubject(){
+
+  const className = document.getElementById("cs_class").value;
+
+  if(!className){
+    alert("Select class");
+    return;
+  }
+
+  // prevent duplicate
+  db.collection("tt_class_subjects")
+    .where("className","==",className)
+    .get()
+    .then(snap=>{
+
+      if(!snap.empty){
+        alert("Already exists. Use Edit.");
+        return;
+      }
+
+      const data = {
+  className,
+
+  english: cs_english.value || 0,
+  hindi: cs_hindi.value || 0,
+  telugu: cs_telugu.value || 0,
+  maths: cs_maths.value || 0,
+  science: cs_science.value || 0,
+  social: cs_social.value || 0,
+  computer: cs_computer.value || 0,
+
+  biology: cs_biology.value || 0,
+  chemistry: cs_chemistry.value || 0,
+  physics: cs_physics.value || 0,
+
+  biolab: cs_biolab.value || 0,
+  chemlab: cs_chemlab.value || 0,
+  physlab: cs_physlab.value || 0,
+
+  games: cs_games.value || 0
+};
+
+      db.collection("tt_class_subjects").add(data)
+      .then(()=>{
+        alert("Class Subject Added");
+        clearClassSubject();
+      });
+
+    });
+}
+
+/* LOAD */
+db.collection("tt_class_subjects").onSnapshot(snap=>{
+  let html = "";
+
+  snap.forEach(doc=>{
+    let d = doc.data();
+
+    html += `
+<div class="row">
+  <div>${d.className}</div>
+
+  <div>${d.english || 0}</div>
+  <div>${d.hindi || 0}</div>
+  <div>${d.telugu || 0}</div>
+  <div>${d.maths || 0}</div>
+  <div>${d.science || 0}</div>
+  <div>${d.social || 0}</div>
+  <div>${d.computer || 0}</div>
+
+  <div>${d.biology || 0}</div>
+  <div>${d.chemistry || 0}</div>
+  <div>${d.physics || 0}</div>
+
+  <div>${d.biolab || 0}</div>
+  <div>${d.chemlab || 0}</div>
+  <div>${d.physlab || 0}</div>
+
+  <div>${d.games || 0}</div>
+
+  <div class="action">
+    <button onclick="selectClassSubject(
+      '${doc.id}',
+      '${d.className}',
+      '${d.english}',
+      '${d.hindi}',
+      '${d.telugu}',
+      '${d.maths}',
+      '${d.science}',
+      '${d.social}',
+      '${d.computer}',
+      '${d.biology}',
+      '${d.chemistry}',
+      '${d.physics}',
+      '${d.biolab}',
+      '${d.chemlab}',
+      '${d.physlab}',
+      '${d.games}'
+    )">Select</button>
+  </div>
+</div>`;
+      });
+
+  document.getElementById("classSubjectList").innerHTML = html;
+});
+
+/* SELECT */
+function selectClassSubject(
+  id, c, eng, hin, tel, math, sci, soc, comp,
+  bio, chem, phy, biolab, chemlab, physlab, games
+){
+  selectedClassSubjectId = id;
+
+  cs_class.value = c;
+
+  cs_english.value = eng;
+  cs_hindi.value = hin;
+  cs_telugu.value = tel;
+  cs_maths.value = math;
+  cs_science.value = sci;
+  cs_social.value = soc;
+  cs_computer.value = comp;
+
+  cs_biology.value = bio;
+  cs_chemistry.value = chem;
+  cs_physics.value = phy;
+
+  cs_biolab.value = biolab;
+  cs_chemlab.value = chemlab;
+  cs_physlab.value = physlab;
+
+  cs_games.value = games;
+}
+
+/* UPDATE */
+function updateClassSubject(){
+
+  if(!selectedClassSubjectId){
+    alert("Select record first");
+    return;
+  }
+
+  db.collection("tt_class_subjects").doc(selectedClassSubjectId).update({
+    className: cs_class.value,
+
+    english: cs_english.value,
+    hindi: cs_hindi.value,
+    telugu: cs_telugu.value,
+    maths: cs_maths.value,
+    science: cs_science.value,
+    social: cs_social.value,
+    computer: cs_computer.value,
+
+    biology: cs_biology.value,
+    chemistry: cs_chemistry.value,
+    physics: cs_physics.value,
+
+    biolab: cs_biolab.value,
+    chemlab: cs_chemlab.value,
+    physlab: cs_physlab.value,
+
+    games: cs_games.value
+  })
+  .then(()=>{
+    alert("Class Subjects Updated");   // 🔥 ADD THIS LINE
+    clearClassSubject();                  // optional (good UX)
+  })
+  .catch(err=>{
+    console.error(err);
+    alert("Error updating data");
+  });
+
+}
+
+/* DELETE */
+function deleteClassSubject(){
+
+  if(!selectedClassSubjectId){
+    alert("Select record first");
+    return;
+  }
+
+  db.collection("tt_class_subjects").doc(selectedClassSubjectId).delete()
+  .then(()=>{
+    alert("Deleted");
+    clearClassSubject();
+  });
+}
+
+/* CLEAR */
+function clearClassSubject(){
+  cs_class.value="";
+  cs_math.value="";
+  cs_english.value="";
+  cs_science.value="";
+  cs_social.value="";
+  cs_hindi.value="";
+  cs_computer.value="";
+  cs_pt.value="";
+  selectedClassSubjectId = null;
+}
+
+
+db.collection("tt_teachers").onSnapshot(snap=>{
+
+  let options = `<option value="">Select Teacher</option>`;
+  let uniqueTeachers = new Map();
+
+  snap.forEach(doc=>{
+    let t = doc.data();
+
+    if(t.name && !uniqueTeachers.has(t.name)){
+      uniqueTeachers.set(t.name, doc.id);
+    }
+  });
+
+  uniqueTeachers.forEach((id, name)=>{
+    options += `<option value="${id}|${name}">${name}</option>`;
+  });
+
+  document.getElementById("p_teacher").innerHTML = options;
+  document.getElementById("tt_teacher").innerHTML = options;
+});
+
+
+document.getElementById("tt_class").onchange = function () {
+
+  let classVal = this.value;
+
+  document.getElementById("tt_classBox").innerText = classVal;
+
+  loadClassSubjects(classVal);   // ✅ ADD THIS LINE
+  loadTimetables();
+};
+
+function loadClassSubjects(className){
+
+  db.collection("tt_class_subjects")
+    .where("className","==",className)
+    .get()
+    .then(snap=>{
+
+      let container = document.getElementById("classSubjectsDisplay");
+      container.innerHTML = "";
+
+      if(snap.empty){
+        container.innerHTML = "<span>No subjects found</span>";
+        return;
+      }
+
+      snap.forEach(doc=>{
+        let d = doc.data();
+
+        let subjects = [
+          ["English", d.english],
+          ["Hindi", d.hindi],
+          ["Telugu", d.telugu],
+          ["Maths", d.maths],
+          ["Science", d.science],
+          ["Social", d.social],
+          ["Computer", d.computer],
+          ["Biology", d.biology],
+          ["Chemistry", d.chemistry],
+          ["Physics", d.physics],
+          ["Bio Lab", d.biolab],
+          ["Chem Lab", d.chemlab],
+          ["Phys Lab", d.physlab],
+          ["Games", d.games]
+        ];
+
+        subjects.forEach(([name, value])=>{
+
+            value = Number(value || 0);   // ensure number
+
+            container.innerHTML += `
+              <div style="
+                padding:6px 10px;
+                background:#F8FAFC;
+                border-radius:15px;
+                border:1px solid #2f4f7f;
+                font-size:13px;
+                display:flex;
+                align-items:center;
+                gap:6px;
+              ">
+                <span>${name}</span>
+                <span style="
+                  font-weight:900;
+                  font-size:15px;
+                  color:${value === 0 ? 'red' : '#2f4f7f'};
+                ">
+                  / ${value}
+                </span>
+              </div>
+            `;
+          });
+      });
+
+    });
+}
+
+document.getElementById("tt_subject").onchange = function(){
+  document.getElementById("tt_subjectBox").innerText = this.value;
+};
+
+document.getElementById("tt_teacher").onchange = function(){
+
+  let [id,name] = this.value.split("|");
+
+  
+
+  // (optional but recommended)
+  document.getElementById("tt_teacherBox").innerText = name;
+
+  // 🔥 LOAD ALL SUBJECTS OF SELECTED TEACHER
+db.collection("tt_teachers")
+  .where("name","==",name)
+  .get()
+  .then(snap=>{
+
+    let subjectMap = {};   // 🔥 KEY CHANGE
+    let classTeacherOf = [];
+
+    snap.forEach(doc=>{
+      let t = doc.data();
+
+      // ✅ GROUP SUBJECT → CLASSES
+      if(t.subject && t.className){
+
+        if(!subjectMap[t.subject]){
+          subjectMap[t.subject] = [];
+        }
+
+        subjectMap[t.subject].push(t.className);
+      }
+
+      // ✅ CLASS TEACHER
+      if(t.isClassTeacher === "Yes"){
+        classTeacherOf.push(t.className);
+      }
+    });
+
+    // ✅ REMOVE DUPLICATES
+    Object.keys(subjectMap).forEach(sub=>{
+      subjectMap[sub] = [...new Set(subjectMap[sub])];
+    });
+
+    classTeacherOf = [...new Set(classTeacherOf)];
+
+    // ✅ FORMAT OUTPUT
+    let subjectDisplay = "";
+
+      Object.keys(subjectMap).forEach(sub=>{
+        subjectDisplay += sub + " : " + subjectMap[sub].join(", ") + "\n";
+      });
+
+    document.getElementById("teachSubjects").innerText = subjectDisplay || "No Subjects";
+
+    // ✅ CLASS TEACHER DISPLAY
+    document.getElementById("teachClassTeacher").innerText =
+      classTeacherOf.length > 0 
+        ? classTeacherOf.join(", ")
+        : "Not a Class Teacher";
+
+  });
+
+
+
+  db.collection("tt_teacher_periods")
+    .where("teacherId","==",id)
+    .get()
+    .then(snap=>{
+      snap.forEach(doc=>{
+        let p = doc.data();
+        document.getElementById("teachClasses").innerText = p.classesPerWeek;
+        document.getElementById("teachFree").innerText = p.freePeriods;
+      });
+
+
+
+
+      autoLoadTimetable();
+    });
+
+};
+
+
+
+
+// ✅ ADD THIS BLOCK HERE (TEACHER LIST UI)
+db.collection("tt_teachers").onSnapshot(snap=>{
+
+  let html = "";
+
+  snap.forEach(doc=>{
+    let t = doc.data();
+
+    html += `
+    <div class="row">
+      <div>${t.name}</div>
+      <div>${t.subject}</div>
+      <div>${t.className}</div>
+      <div>${t.isClassTeacher || "No"}</div>
+      <div class="action">
+        <button onclick="selectTeacher('${doc.id}','${t.name}','${t.subject}','${t.className}','${t.isClassTeacher}')">Select</button>
+      </div>
+    </div>
+    `;
+  });
+
+  document.getElementById("teacherList").innerHTML = html;
+
+});
+
+
+async function createTimetable(){
+
+  let classVal = document.getElementById("tt_class").value;
+  let workType = document.querySelector('input[name="workType"]:checked');
+
+  if(!workType){
+    alert("Please select Work Type (Class Period or Free Period)");
+    return;
+  }
+
+  let isFree = workType.value === "free";
+
+  let subject = isFree 
+  ? "FREE PERIOD" 
+  : document.getElementById("tt_subject").value;
+
+    // ✅ ADD THIS BLOCK
+    if(!isFree && (!subject || subject.trim() === "")){
+      alert("Please select subject");
+      return;
+    }
+
+  let teacherVal = document.getElementById("tt_teacher").value;
+
+  if(!teacherVal){
+    alert("Select teacher");
+    return;
+  }
+
+  let [teacherId, teacherName] = teacherVal.split("|");
+
+  // DAYS
+  let days = [];
+  document.querySelectorAll("#page-timetable input[type=checkbox]").forEach(c=>{
+    if(["MON","TUE","WED","THU","FRI","SAT"].includes(c.value) && c.checked){
+      days.push(c.value);
+    }
+  });
+
+  // PERIODS
+  let periods = [];
+  document.querySelectorAll("#page-timetable input[type=checkbox]").forEach(c=>{
+    if(!isNaN(c.value) && c.checked){
+      periods.push(c.value);
+    }
+  });
+
+  if(days.length === 0 || periods.length === 0){
+    alert("Select at least one day and period");
+    return;
+  }
+
+  // CHECK TEACHER LIMIT
+  let snap = await db.collection("tt_teacher_periods")
+    .where("teacherId","==",teacherId)
+    .get();
+
+  if(snap.empty){
+    alert("Teacher period data not found");
+    return;
+  }
+
+  let data = snap.docs[0]?.data();
+
+  let available = isFree
+    ? Number(data.freePeriods || 0)
+    : Number(data.classesPerWeek || 0);
+
+  let totalSlots = days.length * periods.length;
+
+  if(totalSlots > available){
+    alert("Not enough available periods for this teacher");
+    return;
+  }
+
+  // SAVE ALL WRITES PROPERLY
+  let writes = [];
+
+  days.forEach(day=>{
+    periods.forEach(period=>{
+      writes.push(
+        db.collection("tt_timetable").add({
+          class: classVal,
+          subject,
+          teacherId,
+          teacherName,
+          day,
+          period
+        })
+      );
+    });
+  });
+
+ // 🔥 GET SUBJECT FIELD
+const fieldMap = {
+  "ENGLISH": "english",
+  "HINDI": "hindi",
+  "TELUGU": "telugu",
+  "MATHS": "maths",
+  "SCIENCE": "science",
+  "SOCIAL": "social",
+  "COMPUTER": "computer",
+  "BIOLOGY": "biology",
+  "CHEMISTRY": "chemistry",
+  "PHYSICS": "physics",
+  "BIO LAB": "biolab",
+  "CHEM LAB": "chemlab",
+  "PHYS LAB": "physlab",
+  "GAMES": "games"
+};
+
+const field = fieldMap[subject];
+
+// 🚨 SKIP FREE PERIOD CHECK
+// 🔥 SUBJECT VALIDATION (VERY IMPORTANT)
+
+if(!isFree){
+
+  let classSnap = await db.collection("tt_class_subjects")
+    .where("className","==",classVal)
+    .get();
+
+  // ❌ CASE 1: NO CLASS SUBJECT DATA
+  if(classSnap.empty){
+    alert("Class Subject Summary not found! Please add it first.");
+    return;
+  }
+
+  const fieldMap = {
+    "ENGLISH": "english",
+    "HINDI": "hindi",
+    "TELUGU": "telugu",
+    "MATHS": "maths",
+    "SCIENCE": "science",
+    "SOCIAL": "social",
+    "COMPUTER": "computer",
+    "BIOLOGY": "biology",
+    "CHEMISTRY": "chemistry",
+    "PHYSICS": "physics",
+    "BIO LAB": "biolab",
+    "CHEM LAB": "chemlab",
+    "PHYS LAB": "physlab",
+    "GAMES": "games"
+  };
+
+  const field = fieldMap[subject];
+
+  let valid = false;
+
+  classSnap.forEach(doc=>{
+    let data = doc.data();
+
+    // ❌ CASE 2: ALL SUBJECTS ZERO
+    let total =
+      Number(data.english||0) +
+      Number(data.hindi||0) +
+      Number(data.telugu||0) +
+      Number(data.maths||0) +
+      Number(data.science||0) +
+      Number(data.social||0) +
+      Number(data.computer||0) +
+      Number(data.biology||0) +
+      Number(data.chemistry||0) +
+      Number(data.physics||0) +
+      Number(data.biolab||0) +
+      Number(data.chemlab||0) +
+      Number(data.physlab||0) +
+      Number(data.games||0);
+
+    if(total === 0){
+      alert("All subject periods are 0. Cannot create timetable.");
+      return;
+    }
+
+    // ❌ CASE 3: SELECTED SUBJECT IS ZERO
+    let remaining = Number(data[field] || 0);
+
+    if(remaining > 0){
+      valid = true;
+    }
+  });
+
+  if(!valid){
+    alert("Selected subject has no remaining periods!");
+    return;
+  }
+}
+
+
+  // 🔥 UPDATE TEACHER QUOTA
+let periodSnap = await db.collection("tt_teacher_periods")
+  .where("teacherId","==",teacherId)
+  .get();
+
+periodSnap.forEach(doc => {
+
+  let data = doc.data();
+
+  let usedSlots = days.length * periods.length;
+
+  if(isFree){
+    db.collection("tt_teacher_periods").doc(doc.id).update({
+      freePeriods: Math.max(0, (data.freePeriods || 0) - usedSlots)
+    });
+  } else {
+    db.collection("tt_teacher_periods").doc(doc.id).update({
+      classesPerWeek: Math.max(0, (data.classesPerWeek || 0) - usedSlots)
+    });
+  }
+
+});
+
+  Promise.all(writes)
+  .then(()=>{
+    
+    // ✅ ONLY ONCE: correct deduction
+    let total = days.length * periods.length;
+    updateClassSubjectCount(classVal, subject, -total);
+
+    alert("Timetable Saved Successfully ");
+    loadTimetables();
+  })
+  .catch(err=>{
+    console.error(err);
+    alert("Error saving timetable");
+  });
+
+
+    Promise.all(writes).then(()=>{
+
+  // reduce count once per slot
+  let total = days.length * periods.length;
+  
+
+  alert("Timetable Saved Successfully ✅");
+  loadTimetables();
+
+});
+
+
+
+
+}
+function loadTimetables(){
+
+  const classVal = document.getElementById("tt_class").value || "";
+  const teacherVal = document.getElementById("tt_teacher").value || "";
+
+  let teacherId = "";
+  if(teacherVal) teacherId = teacherVal.split("|")[0];
+
+  db.collection("tt_timetable").onSnapshot(snap=>{
+
+    let data = [];
+
+    snap.forEach(doc=>{
+      data.push(doc.data());
+    });
+
+    if(classVal){
+      renderClassGrid(data, classVal);
+    } else {
+      document.getElementById("classTimeTable").innerHTML =
+        "Select a class to view timetable";
+    }
+
+    if(teacherId){
+      renderTeacherGrid(data, teacherId);
+    } else {
+      document.getElementById("teacherTimeTable").innerHTML =
+        "Select a teacher to view timetable";
+    }
+
+  });
+}
+
+async function renderClassGrid(data, selectedClass){
+
+  let teacherName = await getClassTeacher(selectedClass);
+
+  let days = ["MON","TUE","WED","THU","FRI","SAT"];
+  let periods = [1,2,3,4,5,6,7,8];
+
+  let html = `
+  <div class="tt-card">
+    <div class="tt-header">
+      <div>
+        <div class="tt-main-title">Class Time Table</div>
+        <div class="tt-sub-title tt-class-highlight">${selectedClass}</div>
+      </div>
+      <div class="tt-teacher">Class Teacher: ${teacherName}</div>
+    </div>
+
+    <table class="tt-table">
+      <thead>
+        <tr>
+          <th>Period</th>`;
+
+  days.forEach(d=>{
+    html += `<th>${d}</th>`;
+  });
+
+  html += `</tr></thead><tbody>`;
+
+  periods.forEach(p=>{
+    html += `<tr>
+      <td class="tt-period">${p}</td>`;
+
+    days.forEach(d=>{
+
+      let cell = data.find(x =>
+        x.day === d &&
+        x.period == p &&
+        x.class === selectedClass
+      );
+
+      html += `<td>`;
+
+      if(cell){
+        html += `
+          <div class="tt-cell">
+            <div class="tt-subject ${cell.subject==="FREE PERIOD" ? 'free' : ''}">
+              ${cell.subject}
+            </div>
+            <div class="tt-teacher-name">${cell.teacherName || ""}</div>
+          </div>
+        `;
+      }
+
+      html += `</td>`;
+    });
+
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+
+  document.getElementById("classTimeTable").innerHTML = html;
+}
+async function renderTeacherGrid(data, teacherId){
+
+  let days = ["MON","TUE","WED","THU","FRI","SAT"];
+  let periods = [1,2,3,4,5,6,7,8];
+
+  // 🔥 GET TEACHER NAME + CLASS TEACHER INFO
+  let teacherName = "";
+  let classTeacherOf = [];
+
+  let snap = await db.collection("tt_teachers")
+    .where(firebase.firestore.FieldPath.documentId(), "==", teacherId)
+    .get();
+
+  // ⚠️ Above may not work if same teacher has multiple entries
+  // So better use name-based fetch:
+
+  let teacherSnap = await db.collection("tt_teachers")
+    .get();
+
+  teacherSnap.forEach(doc=>{
+    let t = doc.data();
+
+    if(doc.id === teacherId){
+      teacherName = t.name;
+    }
+
+    if(t.name === teacherName && t.isClassTeacher === "Yes"){
+      classTeacherOf.push(t.className);
+    }
+  });
+
+  classTeacherOf = [...new Set(classTeacherOf)];
+
+  let html = `
+  <div class="tt-card">
+    <div class="tt-header">
+      <div>
+        <div class="tt-main-title">Teacher Time Table</div>
+        <div class="tt-sub-title">${teacherName}</div>
+      </div>
+      <div class="tt-teacher">
+        Class Teacher Of: ${
+          classTeacherOf.length > 0 
+          ? classTeacherOf.join(", ")
+          : "Not a Class Teacher"
+        }
+      </div>
+    </div>
+
+    <table class="tt-table">
+      <thead>
+        <tr>
+          <th>Period</th>`;
+
+  days.forEach(d=>{
+    html += `<th>${d}</th>`;
+  });
+
+  html += `</tr></thead><tbody>`;
+
+  periods.forEach(p=>{
+    html += `<tr>
+      <td class="tt-period">${p}</td>`;
+
+    days.forEach(d=>{
+
+      let cell = data.find(x =>
+        x.day === d &&
+        x.period == p &&
+        x.teacherId === teacherId
+      );
+
+      html += `<td>`;
+
+      if(cell){
+
+        html += `
+          <div onclick="toggleSelect('${cell.day}','${cell.period}','${cell.teacherId}')"
+               class="tt-cell selectable ${isSelected(cell.day,cell.period) ? 'selected' : ''}">
+            
+            <div class="tt-class">${cell.class}</div>
+            <div class="tt-subject">${cell.subject}</div>
+
+          </div>
+        `;
+      }
+
+      html += `</td>`;
+    });
+
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+
+  document.getElementById("teacherTimeTable").innerHTML = html;
+}
+function refreshTimetable(){
+
+  // clear UI first
+  document.getElementById("classTimeTable").innerHTML = "<b>Refreshing...</b>";
+  document.getElementById("teacherTimeTable").innerHTML = "<b>Refreshing...</b>";
+
+  // reload fresh data
+  loadTimetables();
+
+  alert("Timetable refreshed");
+}
+
+function reloadPage(){
+
+  // store last opened page in browser memory
+  localStorage.setItem("lastPage", "timetable");
+
+  // reload full page
+  location.reload();
+}
+
+
+
+function autoLoadTimetable(){
+  const classVal = document.getElementById("tt_class").value;
+  const teacherVal = document.getElementById("tt_teacher").value;
+
+  if(!classVal && !teacherVal){
+    return;
+  }
+
+  loadTimetables();
+}
+
+
+function restoreTeacherWorkBatch(teacherId, isFree, count){
+
+  let ref = db.collection("tt_teacher_periods")
+    .where("teacherId","==",teacherId);
+
+  ref.get().then(snap=>{
+
+    snap.forEach(doc=>{
+
+      let data = doc.data();
+
+      let newClasses = Number(data.classesPerWeek || 0);
+      let newFree = Number(data.freePeriods || 0);
+
+      if(isFree){
+        newFree = newFree + count;
+      } else {
+        newClasses = newClasses + count;
+      }
+
+      db.collection("tt_teacher_periods").doc(doc.id).update({
+        classesPerWeek: newClasses,
+        freePeriods: newFree
+      });
+
+    });
+
+  });
+
+}
+
+function toggleSelect(day, period, teacherId){
+
+  let key = day + "-" + period;
+
+  let index = selectedCells.findIndex(x => x.key === key);
+
+  if(index > -1){
+    selectedCells.splice(index,1); // unselect
+  } else {
+    selectedCells.push({ key, day, period, teacherId });
+  }
+
+  loadTimetables(); // refresh UI
+}
+
+function isSelected(day, period){
+  return selectedCells.some(x => x.key === day + "-" + period);
+}
+
+function deleteSelectedPeriods(){
+
+  if(selectedCells.length === 0){
+    alert("Select periods first");
+    return;
+  }
+
+  const teacherVal = document.getElementById("tt_teacher").value;
+  if(!teacherVal){
+    alert("Select teacher");
+    return;
+  }
+
+  let teacherId = teacherVal.split("|")[0];
+
+  db.collection("tt_timetable").get().then(snap=>{
+
+    let batch = db.batch();
+
+    let deleteCount = 0;
+
+    snap.forEach(doc=>{
+
+      let d = doc.data();
+
+      selectedCells.forEach(sel=>{
+
+        if(
+          d.teacherId === teacherId &&
+          d.day === sel.day &&
+          d.period == sel.period
+        ){
+
+          batch.delete(doc.ref);
+
+          deleteCount++;
+
+        }
+
+      });
+
+    });
+
+    batch.commit().then(()=>{
+
+      // 🔥 IMPORTANT: restore teacher quota AFTER delete
+      if(deleteCount > 0){
+
+        // detect if FREE or CLASS
+        let isFree = false;
+
+        snap.forEach(doc=>{
+          let d = doc.data();
+
+          selectedCells.forEach(sel=>{
+            if(
+              d.teacherId === teacherId &&
+              d.day === sel.day &&
+              d.period == sel.period
+            ){
+              if(d.subject === "FREE PERIOD"){
+                isFree = true;
+              }
+            }
+          });
+        });
+
+        restoreTeacherWorkBatch(teacherId, isFree, deleteCount);
+      }
+
+      alert("Deleted successfully");
+
+      selectedCells.forEach(sel=>{
+      updateClassSubjectCount(classVal, cellSubject(sel), +1);
+      });
+
+      selectedCells = [];
+      loadTimetables();
+
+    });
+
+  });
+
+}
+
+function cellSubject(sel){
+  // get subject from UI snapshot if needed
+  let el = document.querySelector(`[data-key="${sel.key}"]`);
+  return el?.dataset?.subject || "ENGLISH"; // fallback
+}
+
+async function getClassTeacher(className){
+
+  let teacherName = "Not Assigned";
+
+  let snap = await db.collection("tt_teachers")
+    .where("className","==",className)
+    .where("isClassTeacher","==","Yes")
+    .get();
+
+  snap.forEach(doc=>{
+    teacherName = doc.data().name;
+  });
+
+  return teacherName;
+}
+
+function filterTeachers(){
+
+  const search = document.getElementById("teacherSearch").value.toLowerCase();
+
+  const rows = document.querySelectorAll("#teacherList .row");
+
+  rows.forEach(row => {
+    const name = row.children[0].innerText.toLowerCase();
+
+    if(name.includes(search)){
+      row.style.display = "grid";
+    } else {
+      row.style.display = "none";
+    }
+  });
+
+}
+
+async function updateClassSubjectCount(className, subject, change){
+
+  const fieldMap = {
+    "ENGLISH": "english",
+    "HINDI": "hindi",
+    "TELUGU": "telugu",
+    "MATHS": "maths",
+    "SCIENCE": "science",
+    "SOCIAL": "social",
+    "COMPUTER": "computer",
+    "BIOLOGY": "biology",
+    "CHEMISTRY": "chemistry",
+    "PHYSICS": "physics",
+    "BIO LAB": "biolab",
+    "CHEM LAB": "chemlab",
+    "PHYS LAB": "physlab",
+    "GAMES": "games"
+  };
+
+  const field = fieldMap[subject];
+  if(!field) return;
+
+  let snap = await db.collection("tt_class_subjects")
+    .where("className","==",className)
+    .get();
+
+  snap.forEach(doc=>{
+    let data = doc.data();
+
+    let current = Number(data[field] || 0);
+
+    // 🔥 IMPORTANT RULE:
+    // If already 0 → DO NOT ALLOW INCREASE
+    if(current === 0 && change > 0){
+      console.warn(subject + " is locked at 0 for " + className);
+      return;
+    }
+
+    let updated = current + change;
+
+    // 🔒 NEVER go below 0
+    if(updated < 0){
+      updated = 0;
+    }
+
+    db.collection("tt_class_subjects")
+      .doc(doc.id)
+      .update({
+        [field]: updated
+      });
+  });
+}
+
+function loadClassTeacherList(){
+
+  db.collection("tt_teachers").onSnapshot(snap=>{
+
+    let teacherMap = {};
+
+    snap.forEach(doc=>{
+      let t = doc.data();
+
+      if(!teacherMap[t.name]){
+        teacherMap[t.name] = {
+          isClassTeacher: false,
+          classes: []
+        };
+      }
+
+      // If ANY entry is Yes → mark true
+      if(t.isClassTeacher === "Yes"){
+        teacherMap[t.name].isClassTeacher = true;
+        teacherMap[t.name].classes.push(t.className);
+      }
+    });
+
+    let html = "";
+    let count = 1;
+
+    Object.keys(teacherMap).forEach(name=>{
+
+      let t = teacherMap[name];
+
+      if(t.isClassTeacher){
+
+        html += `
+        <div class="row" style="grid-template-columns:60px 1fr 1fr;">
+          <div><b>${count++}</b></div>
+          <div>${name}</div>
+          <div>${[...new Set(t.classes)].join(", ")}</div>
+        </div>
+        `;
+      }
+
+    });
+
+    document.getElementById("classTeacherList").innerHTML = html;
+
+  });
+}
+function printClassTeacherList(){
+
+  let rows = document.querySelectorAll("#classTeacherList .row");
+
+  let tableRows = "";
+  let count = 1;
+
+  rows.forEach(row=>{
+    tableRows += `
+      <tr>
+        <td>${count++}</td>
+        <td>${row.children[1].innerText}</td>
+        <td>${row.children[2].innerText}</td>
+        </tr>
+    `;
+  });
+
+  let printWindow = window.open('', '', 'width=900,height=700');
+
+  printWindow.document.write(`
+    <html>
+    <head>
+      <title>Class Teacher List</title>
+      <style>
+        body{
+        font-family:Arial;
+        padding:20px;
+        font-size:13px;   /* 🔥 overall smaller */
+      }
+
+      h2{
+        text-align:center;
+        margin-bottom:5px;
+        font-size:16px;
+      }
+
+      h4{
+        text-align:center;
+        margin-top:0;
+        color:#555;
+        font-size:13px;
+      }
+
+      .date{
+        text-align:right;
+        font-size:11px;
+        margin-top:10px;
+      }
+
+      table{
+        width:100%;
+        border-collapse:collapse;
+        margin-top:20px;
+      }
+
+      th,td{
+        border:1px solid #000;
+        padding:6px;   /* 🔥 reduced padding */
+        text-align:left;
+        font-size:13px;  /* 🔥 small text */
+      }
+
+      th{
+        background:#2f4f7f;
+        color:white;
+      }
+
+      tr:nth-child(even){
+        background:#f2f2f2;
+      }
+
+      .footer{
+        margin-top:40px;
+        display:flex;
+        justify-content:space-between;
+        font-size:13px;
+      }
+      </style>
+    </head>
+
+    <body>
+
+      <h2>St. Anns High School ICSE-ISC</h2>
+      <h4>Pet Basheerabad - Kompally</h4>
+
+      <div class="date">
+        Date: ${new Date().toLocaleDateString()}
+      </div>
+
+      <h3 style="text-align:center;margin-top:20px;">
+        Class Teacher List
+      </h3>
+
+      <table>
+        <tr>
+          <th>S.No</th>
+          <th>Teacher Name</th>
+          <th>Class & Section</th>
+        </tr>
+
+        ${tableRows}
+
+      </table>
+
+      <div class="footer">
+        <div>Signature</div>
+        <div>Principal</div>
+      </div>
+
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.print();
+}
+function loadNonClassTeacherList(){
+
+  db.collection("tt_teachers").onSnapshot(snap=>{
+
+    let teacherMap = {};
+
+    snap.forEach(doc=>{
+      let t = doc.data();
+
+      if(!teacherMap[t.name]){
+        teacherMap[t.name] = {
+          hasYes: false,
+          subjects: [],
+          classes: []   // ✅ NEW
+        };
+      }
+
+      if(t.isClassTeacher === "Yes"){
+        teacherMap[t.name].hasYes = true;
+      }
+
+      if(t.subject){
+        teacherMap[t.name].subjects.push(t.subject);
+      }
+
+      if(t.className){
+        teacherMap[t.name].classes.push(t.className); // ✅ NEW
+      }
+    });
+
+    let html = "";
+    let count = 1;
+
+    Object.keys(teacherMap).forEach(name=>{
+
+      let t = teacherMap[name];
+
+      // 🔥 ONLY if NO "Yes"
+      if(!t.hasYes){
+
+        html += `
+        <div class="row" style="grid-template-columns:60px 1fr 1fr 1fr;">
+          <div><b>${count++}</b></div>
+          <div>${name}</div>
+          <div>${[...new Set(t.subjects)].join(", ")}</div>
+          <div>${[...new Set(t.classes)].join(", ")}</div>
+        </div>
+        `;
+      }
+
+    });
+
+    document.getElementById("nonClassTeacherList").innerHTML = html;
+
+  });
+}
+function printNonClassTeacherList(){
+
+  let rows = document.querySelectorAll("#nonClassTeacherList .row");
+
+  let tableRows = "";
+  let count = 1;
+
+  rows.forEach(row=>{
+    tableRows += `
+      <tr>
+        <td>${count++}</td>
+        <td>${row.children[1].innerText}</td>
+        <td>${row.children[2].innerText}</td>
+        <td>${row.children[3].innerText}</td>
+      </tr>
+    `;
+  });
+
+  let printWindow = window.open('', '', 'width=900,height=700');
+
+  printWindow.document.write(`
+    <html>
+    <head>
+      <title>Non-Class Teacher List</title>
+      <style>
+        body{
+          font-family:Arial;
+          padding:20px;
+          font-size:13px;
+        }
+
+        h2{
+          text-align:center;
+          font-size:16px;
+        }
+
+        h4{
+          text-align:center;
+          font-size:13px;
+          color:#555;
+        }
+
+        .date{
+          text-align:right;
+          font-size:11px;
+        }
+
+        table{
+          width:100%;
+          border-collapse:collapse;
+          margin-top:20px;
+        }
+
+        th,td{
+          border:1px solid #000;
+          padding:6px;
+          font-size:13px;
+        }
+
+        th{
+          background:#2f4f7f;
+          color:white;
+        }
+
+        tr:nth-child(even){
+          background:#f2f2f2;
+        }
+
+        .footer{
+          margin-top:40px;
+          display:flex;
+          justify-content:space-between;
+        }
+      </style>
+    </head>
+
+    <body>
+
+      <h2>St. Anns High School ICSE-ISC</h2>
+      <h4>Pet Basheerabad - Kompally</h4>
+
+      <div class="date">
+        Date: ${new Date().toLocaleDateString()}
+      </div>
+
+      <h3 style="text-align:center;margin-top:20px;">
+        Non-Class Teacher List
+      </h3>
+
+      <table>
+        <tr>
+          <th>S.No</th>
+          <th>Teacher Name</th>
+          <th>Subject</th>
+          <th>Class & Section</th>
+        </tr>
+
+        ${tableRows}
+      </table>
+
+      <div class="footer">
+        <div>Signature</div>
+        <div>Principal</div>
+      </div>
+
+    </body>
+    </html>
+  `);
+
+  printWindow.document.close();
+  printWindow.print();
+}
+function reloadClassTeacherList(){
+  document.getElementById("classTeacherList").innerHTML = "<b>Refreshing...</b>";
+  loadClassTeacherList();
+}
+
+function reloadNonClassTeacherList(){
+  document.getElementById("nonClassTeacherList").innerHTML = "<b>Refreshing...</b>";
+  loadNonClassTeacherList();
+}
+
+function loadPrintClass(){
+
+  let classVal = document.getElementById("print_class").value;
+
+  if(!classVal){
+    alert("Select class");
+    return;
+  }
+
+  db.collection("tt_timetable").get().then(snap=>{
+
+    let data = [];
+    snap.forEach(doc=> data.push(doc.data()));
+
+    renderPrintClass(data, classVal);
+
+  });
+}
+async function renderPrintClass(data, selectedClass){
+
+  let teacherName = await getClassTeacher(selectedClass);
+
+  let days = ["MON","TUE","WED","THU","FRI","SAT"];
+  let periods = [1,2,3,4,5,6,7,8];
+
+  let html = `
+  <div id="printContent">
+
+    <h2 style="text-align:center;">St. Anns High School ICSE-ISC</h2>
+    <h4 style="text-align:center;">Pet Basheerabad - Kompally</h4>
+
+    <div style="text-align:right;font-size:12px;">
+      Date: ${new Date().toLocaleDateString()}
+    </div>
+
+    <h3 style="text-align:center;margin-top:10px;">
+      Class Time Table - ${selectedClass}
+    </h3>
+
+    <div style="margin-bottom:10px;">
+      Class Teacher: <b>${teacherName}</b>
+    </div>
+
+    <table border="1" style="width:100%;border-collapse:collapse;text-align:center;">
+      <tr>
+        <th>Period</th>
+        ${days.map(d=>`<th>${d}</th>`).join("")}
+      </tr>
+  `;
+
+  periods.forEach(p=>{
+    html += `<tr><td>${p}</td>`;
+
+    days.forEach(d=>{
+      let cell = data.find(x =>
+        x.day===d && x.period==p && x.class===selectedClass
+      );
+
+      html += `<td>${
+        cell 
+        ? `<b>${cell.subject}</b><br><small>${cell.teacherName}</small>` 
+        : ""
+      }</td>`;
+    });
+
+    html += `</tr>`;
+  });
+
+  html += `</table></div>`;
+
+  document.getElementById("printArea").innerHTML = html;
+}
+
+function loadPrintTeacher(){
+
+  let teacherVal = document.getElementById("print_teacher").value;
+
+  if(!teacherVal){
+    alert("Select teacher");
+    return;
+  }
+
+  let teacherId = teacherVal.split("|")[0];
+
+  db.collection("tt_timetable").get().then(snap=>{
+
+    let data = [];
+    snap.forEach(doc=> data.push(doc.data()));
+
+    renderPrintTeacher(data, teacherId);
+
+  });
+}
+async function renderPrintTeacher(data, teacherId){
+
+  let days = ["MON","TUE","WED","THU","FRI","SAT"];
+  let periods = [1,2,3,4,5,6,7,8];
+
+  let teacherName = "";
+let classTeacherOf = [];
+
+let snap = await db.collection("tt_teachers").get();
+
+snap.forEach(doc=>{
+  let t = doc.data();
+
+  // get teacher name
+  if(doc.id === teacherId){
+    teacherName = t.name;
+  }
+
+  // check class teacher
+  if(t.name === teacherName && t.isClassTeacher === "Yes"){
+    classTeacherOf.push(t.className);
+  }
+});
+
+// remove duplicates
+classTeacherOf = [...new Set(classTeacherOf)];
+
+  let html = `
+  <div id="printContent">
+
+    <h2 style="text-align:center;">St. Anns High School ICSE-ISC</h2>
+    <h4 style="text-align:center;">Pet Basheerabad - Kompally</h4>
+
+    <div style="text-align:right;font-size:12px;">
+      Date: ${new Date().toLocaleDateString()}
+    </div>
+
+    <h3 style="text-align:center;margin-top:10px;">
+      Teacher Time Table - ${teacherName}
+    </h3>
+
+    <div style="margin-bottom:10px;">
+  Class Teacher Of: 
+  <b>
+    ${
+      classTeacherOf.length > 0
+      ? classTeacherOf.join(", ")
+      : "Not a Class Teacher"
+    }
+  </b>
+</div>
+    
+    <table border="1" style="width:100%;border-collapse:collapse;text-align:center;">
+      <tr>
+        <th>Period</th>
+        ${days.map(d=>`<th>${d}</th>`).join("")}
+      </tr>
+  `;
+
+  periods.forEach(p=>{
+    html += `<tr><td>${p}</td>`;
+
+    days.forEach(d=>{
+      let cell = data.find(x =>
+        x.day===d && x.period==p && x.teacherId===teacherId
+      );
+
+      html += `<td>${
+        cell 
+        ? `<b>${cell.class}</b><br><small>${cell.subject}</small>` 
+        : ""
+      }</td>`;
+    });
+
+    html += `</tr>`;
+  });
+
+  html += `</table></div>`;
+
+  document.getElementById("printArea").innerHTML = html;
+}
+function printTimetable(){
+
+  let content = document.getElementById("printContent");
+
+  if(!content){
+    alert("Nothing to print");
+    return;
+  }
+
+  let win = window.open('', '', 'width=900,height=700');
+
+  win.document.write(`
+    <html>
+    <head>
+      <title>Time Table</title>
+      <style>
+
+/* 🔥 REMOVE DEFAULT MARGINS */
+body{
+  font-family:Arial;
+  padding:15px;
+  margin:0;
+}
+
+/* 🔥 REMOVE ALL HEADING DEFAULT SPACE */
+h1,h2,h3,h4,h5,h6{
+  margin:0;
+  padding:0;
+}
+
+/* 🔥 CUSTOM HEADER */
+.print-header{
+  text-align:center;
+  line-height:1.2;
+}
+
+.print-header .school{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.print-header .address{
+  font-size:13px;
+  margin-top:2px;
+}
+
+/* DATE LINE */
+.print-date{
+  display:flex;
+  justify-content:space-between;
+  margin-top:5px;
+  font-size:11px;
+}
+
+/* TITLE */
+.print-title{
+  text-align:center;
+  margin:6px 0;
+  font-size:16px;
+  font-weight:bold;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:5px;
+}
+
+th,td{
+  border:1px solid #000;
+  padding:6px;
+  text-align:center;
+}
+
+th{
+  background:#ffffff;   /* or remove background */
+  color:#000000;        /* BLACK text */
+}
+
+</style>
+    </head>
+    <body>
+      ${content.innerHTML}
+    </body>
+    </html>
+  `);
+
+  win.document.close();
+  win.print();
+}
+
+function forceUppercase(el){
+  el.value = el.value.toUpperCase();
+}
+
+function reloadPrint(){
+
+  // clear current print area
+  document.getElementById("printArea").innerHTML = "<b>Refreshing...</b>";
+
+  // reset dropdowns (optional but good)
+  document.getElementById("print_class").value = "";
+  document.getElementById("print_teacher").value = "";
+
+  // reload dropdown data again
+  document.getElementById("print_class").innerHTML =
+    document.getElementById("tt_class").innerHTML;
+
+  document.getElementById("print_teacher").innerHTML =
+    document.getElementById("tt_teacher").innerHTML;
+
+  // clear display
+  setTimeout(()=>{
+    document.getElementById("printArea").innerHTML = "";
+  }, 500);
+
+  alert("Print section reloaded");
+}
+
+function resetAllForms(){
+
+  // 🔥 Clear ALL input fields
+  document.querySelectorAll("input").forEach(el=>{
+    if(el.type === "checkbox" || el.type === "radio"){
+      el.checked = false;
+    } else {
+      el.value = "";
+    }
+  });
+
+  // 🔥 Clear ALL dropdowns
+  document.querySelectorAll("select").forEach(el=>{
+    el.selectedIndex = 0;
+  });
+
+  // 🔥 Reset global variables
+  selectedId = null;
+  selectedPeriodId = null;
+  selectedClassSubjectId = null;
+  selectedCells = [];
+
+  // 🔥 Clear UI sections
+  const ids = [
+    "classTimeTable",
+    "teacherTimeTable",
+    "printArea",
+    "classSubjectsDisplay",
+    "teachSubjects",
+    "teachClassTeacher",
+    "teachClasses",
+    "teachFree"
+  ];
+
+  ids.forEach(id=>{
+    let el = document.getElementById(id);
+    if(el) el.innerHTML = "";
+  });
+
+}
+
+window.onload = function(){
+
+  let lastPage = localStorage.getItem("lastPage");
+
+  if(lastPage){
+    showPage(lastPage);   // ✅ restore EXACT page
+  } else {
+    showPage("teacher");  // default only first time
+  }
+
+  // ❌ REMOVE THIS LINE (VERY IMPORTANT)
+  // localStorage.removeItem("lastPage");
+
+  loadClassDropdown();
+
+  document.getElementById("classTimeTable").innerHTML = "";
+  document.getElementById("teacherTimeTable").innerHTML = "";
+};
+</script>
+
+</body>
+</html>
